@@ -41,7 +41,7 @@ This project demonstrates API integration, data transformation, and clear visual
 
 | Dashboard Overview | Charts | Listings Table |
 |--------------------|--------|----------------|
-| ![Dashboard](Screenshot%202025-10-15%20132918.png) | ![Charts](Screenshot%202025-10-15%20132854.png) | ![Listings](Screenshot%202025-10-15%20132938.png) |
+| ![Dashboard](./Screenshot%202025-10-15%20132918.png) | ![Charts](./Screenshot%202025-10-15%20132854.png) | ![Listings](./Screenshot%202025-10-15%20132938.png) |
 
 ---
 
