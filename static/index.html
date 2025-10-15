@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Microburbs Sandbox — Suburb Properties Dashboard</title>
+
+  <!-- Tailwind (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <meta name="description" content="Turns the Microburbs Sandbox API into simple investor insights: median price, days on market, price per sqm, price per bedroom." />
+</head>
+<body class="bg-gray-50 text-gray-900">
+  <!-- Header -->
+  <header class="bg-white border-b sticky top-0 z-10">
+    <div class="max-w-6xl mx-auto px-6 py-5">
+      <h1 class="text-2xl font-semibold">Suburb Properties — Investor Dashboard</h1>
+      <p class="text-sm text-gray-600 mt-1">
+        Powered by the <span class="font-medium">Microburbs Sandbox API</span>. Enter a suburb, fetch listings, and view clear, investor-friendly metrics.
+      </p>
+      <p class="text-xs text-gray-500 mt-1">Endpoint used: <code>/report_generator/api/suburb/properties</code> (Authorization: <code>Bearer test</code>)</p>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-6 py-6 space-y-8">
+    <!-- Controls -->
+    <section class="bg-white p-4 rounded-xl shadow">
+      <div class="grid md:grid-cols-4 gap-4 items-end">
+        <div>
+          <label for="suburbInput" class="block text-sm text-gray-600 mb-1">Suburb</label>
+          <input id="suburbInput" class="w-full border rounded-md px-3 py-2 text-sm" placeholder="e.g., Belmont North" value="Belmont North" />
+        </div>
+
+        <div>
+          <label for="typeSelect" class="block text-sm text-gray-600 mb-1">Property Type (optional)</label>
+          <select id="typeSelect" class="w-full border rounded-md px-3 py-2 text-sm">
+            <option value="">All</option>
+            <option value="House">House</option>
+            <option value="Unit">Unit</option>
+            <option value="Townhouse">Townhouse</option>
+          </select>
+        </div>
+
+        <div class="md:col-span-2 flex items-end gap-3">
+          <button id="fetchBtn" class="px-4 py-2 rounded-lg bg-black text-white text-sm font-medium hover:opacity-90">
+            Fetch from Sandbox
+          </button>
+          <span id="statusText" class="text-xs text-gray-500"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Summary cards -->
+    <section class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="bg-white p-4 rounded-xl shadow">
+        <p class="text-xs text-gray-500">Listings</p>
+        <p id="summaryCount" class="text-2xl font-semibold">–</p>
+        <p class="text-xs text-gray-500 mt-1">Number of properties returned</p>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl shadow">
+        <p class="text-xs text-gray-500">Median Price</p>
+        <p id="summaryMedianPrice" class="text-2xl font-semibold">–</p>
+        <p class="text-xs text-gray-500 mt-1">From current for-sale listings</p>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl shadow">
+        <p class="text-xs text-gray-500">Median Price / sqm</p>
+        <p id="summaryMedianPPSQM" class="text-2xl font-semibold">–</p>
+        <p class="text-xs text-gray-500 mt-1">Where land size is available</p>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl shadow">
+        <p class="text-xs text-gray-500">Median Days on Market</p>
+        <p id="summaryMedianDOM" class="text-2xl font-semibold">–</p>
+        <p class="text-xs text-gray-500 mt-1">Since listing_date</p>
+      </div>
+    </section>
+
+    <!-- Charts -->
+    <section class="grid lg:grid-cols-3 gap-6">
+      <div class="bg-white p-4 rounded-xl shadow">
+        <h2 class="font-medium mb-2">Price per sqm (by property)</h2>
+        <canvas id="priceSqmChart"></canvas>
+        <p class="text-xs text-gray-500 mt-2">Shows relative land value where land_size is provided.</p>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl shadow">
+        <h2 class="font-medium mb-2">Days on Market (since listing)</h2>
+        <canvas id="domChart"></canvas>
+        <p class="text-xs text-gray-500 mt-2">Shorter DOM can imply stronger demand.</p>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl shadow">
+        <h2 class="font-medium mb-2">Bedroom Mix</h2>
+        <canvas id="bedroomMixChart"></canvas>
+        <p class="text-xs text-gray-500 mt-2">Distribution of bedrooms across current listings.</p>
+      </div>
+    </section>
+
+    <!-- Table -->
+    <section class="bg-white p-4 rounded-xl shadow">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="font-medium">Listings</h2>
+        <input id="searchInput" class="border rounded-md px-3 py-2 text-sm" placeholder="Search street / type…" />
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm">
+          <thead>
+            <tr class="text-left border-b">
+              <th class="py-2 pr-4">Street</th>
+              <th class="py-2 pr-4">Type</th>
+              <th class="py-2 pr-4">Beds</th>
+              <th class="py-2 pr-4">Baths</th>
+              <th class="py-2 pr-4">Garage</th>
+              <th class="py-2 pr-4">Price</th>
+              <th class="py-2 pr-4">Land (sqm)</th>
+              <th class="py-2 pr-4">Price/sqm</th>
+              <th class="py-2 pr-4">Listed</th>
+              <th class="py-2 pr-4">DOM</th>
+            </tr>
+          </thead>
+          <tbody id="propTbody"></tbody>
+        </table>
+      </div>
+      <p class="text-xs text-gray-500 mt-3">Tip: Use the search box to filter quickly; charts update with filtered results.</p>
+    </section>
+
+    <!-- Explainer -->
+    <section class="bg-white p-4 rounded-xl shadow">
+      <h3 class="font-medium mb-2">What the metrics mean (plain-English)</h3>
+      <ul class="list-disc ml-5 text-sm text-gray-700 space-y-1">
+        <li><span class="font-medium">Price per sqm</span>: price ÷ land size (sqm). Useful for comparing land value across listings.</li>
+        <li><span class="font-medium">Days on Market</span>: days since listing_date. Shorter often implies stronger buyer demand.</li>
+        <li><span class="font-medium">Bedroom Mix</span>: quick view of stock profile (e.g., more 3–4 bed houses).</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="max-w-6xl mx-auto px-6 py-8 text-xs text-gray-500">
+    Built with Flask + Vanilla JS + Chart.js. Data: Microburbs Sandbox (Bearer <code>test</code>).
+  </footer>
+
+  <!-- App logic -->
+  <script src="/static/app.js"></script>
+</body>
+</html>
