@@ -41,7 +41,7 @@ This project demonstrates API integration, data transformation, and clear visual
 
 | Dashboard Overview | Charts | Listings Table |
 |--------------------|--------|----------------|
-| ![Dashboard](./Screenshot%202025-10-15%20132918.png) | ![Charts](./Screenshot%202025-10-15%20132854.png) | ![Listings](./Screenshot%202025-10-15%20132938.png) |
+| ![Dashboard](https://github.com/ompatil21/Microburbs/blob/main/screenshots/Screenshot%202025-10-15%20132918.png?raw=true) | ![Charts](https://github.com/ompatil21/Microburbs/blob/main/screenshots/Screenshot%202025-10-15%20132854.png?raw=true) | ![Listings](https://github.com/ompatil21/Microburbs/blob/main/screenshots/Screenshot%202025-10-15%20132938.png?raw=true) |
 
 ---
 
